@@ -1,0 +1,2 @@
+* * * * * /usr/bin/env bash /home/ubuntu/viikko3/report.sh >/dev/null 2>&1
+0 * * * * /home/ubuntu/viikko4/backup.sh
