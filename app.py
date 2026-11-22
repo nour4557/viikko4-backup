@@ -4,24 +4,23 @@ import os
 
 app = Flask(__name__)
 
+
 def get_visitors():
     connection = pymysql.connect(
         host="localhost",
         user="viikko4read",
         password=os.environ["DB_PASSWORD"],
-        database="viikko2",
-        charset="utf8mb4"
+        database="viikko2"
     )
 
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT kaynnit FROM laskuri WHERE id = 1")
-            visitors = cursor.fetchone()[0]
+    cursor = connection.cursor()
+    cursor.execute("SELECT kaynnit FROM laskuri WHERE id = 1")
+    result = cursor.fetchone()
 
-        return visitors
+    cursor.close()
+    connection.close()
 
-    finally:
-        connection.close()
+    return result[0] if result else 0
 
 
 @app.route("/")
@@ -30,76 +29,237 @@ def home():
 
     return f"""
     <!DOCTYPE html>
-    <html lang="en">
+    <html>
     <head>
-        <meta charset="UTF-8">
         <title>Week 4 - Server B</title>
+
+        <style>
+            body {{
+                background-color: #f5eee5;
+                font-family: Arial, sans-serif;
+                color: #49382d;
+                margin: 0;
+                padding: 30px 15px;
+                line-height: 1.6;
+            }}
+
+            .container {{
+                max-width: 850px;
+                margin: auto;
+            }}
+
+            .card {{
+                background: #fffaf4;
+                padding: 25px;
+                margin-bottom: 20px;
+                border-radius: 12px;
+            }}
+
+            h1, h2 {{
+                color: #805b43;
+            }}
+
+            h1 {{
+                text-align: center;
+            }}
+
+            h2 {{
+                border-bottom: 1px solid #e8d8c3;
+                padding-bottom: 8px;
+            }}
+
+            .counter {{
+                text-align: center;
+                font-size: 50px;
+                font-weight: bold;
+                color: #9b704f;
+                margin: 15px;
+            }}
+
+            a {{
+                color: #795548;
+            }}
+
+            li {{
+                margin-bottom: 8px;
+            }}
+        </style>
     </head>
-    <body style="font-family: Arial; background-color: #e8d8c3;
-                 color: #795548; text-align: center; padding: 20px;">
 
-        <h1>Week 4 - Server B</h1>
-        <h2>Read-only Replica</h2>
+    <body>
+    <div class="container">
 
-        <h2>Replicated Visitor Counter</h2>
-        <h1>{visitors}</h1>
+        <div class="card">
+            <h1>Week 4 - Server B</h1>
 
-        <p>This counter is read from the local MariaDB database
-        on Server B.</p>
+            <p style="text-align:center;">
+                My second server
+            </p>
 
-        <p>The database is replicated from Server A.</p>
+            <h2 style="text-align:center;">Visitor Counter</h2>
 
-        <p>This page only uses SELECT and does not increase
-        the visitor count.</p>
+            <div class="counter">{visitors}</div>
 
-        <hr>
+            <p style="text-align:center;">
+                This counter shows the value from Server B's database,
+                and this page does not increase it.
+            </p>
+        </div>
 
-        <h2>Project Links</h2>
-        <p><a href="http://193.166.24.219/viikko2/">Week 2 - Server A</a></p>
-        <p><a href="http://193.166.24.219/viikko3/">Week 3 - Server A</a></p>
 
-        <h2>How I created Server B</h2>
-        <p>I created Server B using a snapshot of Server A in cPouta.
-        Server B has its own IP address.</p>
+        <div class="card">
+            <h2>My two servers</h2>
 
-        <h2>Storage and Backups</h2>
-        <p>The website files are stored in /var/www/html on Server A.</p>
-        <p>Website backups are copied to /var/backups/website on Server B.</p>
-        <p>The backup script uses rsync over SSH and creates a new
-        timestamped backup every hour using cron.</p>
+            <p>
+                Server A is my first server. It runs my Week 2 page
+                and Week 3 report.
+            </p>
 
-        <h2>Users and Permissions</h2>
-        <p>The Linux user ubuntu runs the backup script.</p>
-        <p>The SSH backup key is stored in the ubuntu user's
-        .ssh directory.</p>
-        <p>The backup directory is owned by ubuntu and has
-        restricted permissions.</p>
-        <p>The database user viikko4read has SELECT permission
-        on the visitor counter table.</p>
+            <p>
+                I made Server B from a snapshot of Server A in cPouta.
+                After creating it, I gave B its own IP address.
+            </p>
 
-        <h2>Database Replication</h2>
-        <p>MariaDB replicates changes from Server A to Server B.</p>
-        <p>Server B is configured as a read-only replica.
-        The Week 4 application only reads the replicated counter.</p>
+            <p>
+                A is the main server where the visitor counter changes.
+                B gets the updates from A and shows the counter on this page.
+            </p>
 
-        <h2>Testing</h2>
-        <p>I checked that both replication threads were running
-        and that there were no replication errors.</p>
-        <p>I increased the counter on Server A and checked that
-        the new value appeared on Server B.</p>
+            <ul>
+                <li>
+                    <a href="http://193.166.24.219/viikko2/">
+                        Server A - Week 2
+                    </a>
+                </li>
+                <li>
+                    <a href="http://193.166.24.219/viikko3/">
+                        Server A - Week 3
+                    </a>
+                </li>
+            </ul>
+        </div>
 
-        <h2>What I learned</h2>
-        <p>I learned how to create a second server, configure
-        database replication and make automatic website backups.</p>
 
-        <h2>GitHub</h2>
-        <a href="https://github.com/nour4557/viikko3-Bash-and-a-Server-Status-Report">
-        GitHub</a>
+        <div class="card">
+            <h2>Storage and users</h2>
 
+            <p>
+                The website files on A are in /var/www/html.
+                I save the backups on B in /var/backups/website.
+            </p>
+
+            <p>
+                I use the Linux user ubuntu to run my backup script.
+                The backup folder belongs to ubuntu and other users
+                cannot access it normally.
+            </p>
+
+            <p>
+                I also made a database user called viikko4read for
+                my Week 4 application. It can only read the visitor
+                counter table.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h2>Website backups</h2>
+
+            <p>
+                I made a script called backup.sh to copy the website
+                files from A to B. I used rsync and SSH for this.
+            </p>
+
+            <p>
+                I added the script to cron so it runs every hour.
+                Each backup has its own date and time in the folder name.
+            </p>
+
+            <p>
+                The script also saves a message in backup.log to show
+                if the backup worked or failed.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h2>Database replication</h2>
+
+            <p>
+                I set up MariaDB replication between A and B.
+                A is the main database and B gets the changes from it.
+            </p>
+
+            <p>
+                I opened the Week 2 page on A a few times and saw
+                that the counter updated on B too.
+            </p>
+
+            <p>
+                The Week 4 page only reads the counter. It does not
+                increase it or make changes to the database.
+            </p>
+
+            <p>
+                Replication is not the same as a backup. If I delete
+                something by mistake on A, that change can also appear
+                on B. Backups are useful because I can go back to an
+                older copy of the files.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h2>Testing</h2>
+
+            <ul>
+                <li>I checked that both Week 2 and Week 4 pages open.</li>
+                <li>I opened the Week 2 page on A a few times and saw that the counter updated on B too.</li>
+                <li>I opened the Week 4 page on B and checked that it did not increase the counter.</li>
+                <li>I checked MariaDB and saw that both replication threads were running.</li>
+                <li>I made timestamped backups of the website files.</li>
+                <li>I restored a test file to another folder and checked its SHA256 hash against the original file. They matched.</li>
+            </ul>
+
+            <p>
+                I still need to test that everything works after
+                restarting Server B.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h2>What I learned</h2>
+
+            <p>
+                I learned how to make a second server from a snapshot
+                and how to copy files between two servers.
+            </p>
+
+            <p>
+                I also learned how to make automatic backups with cron
+                and how MariaDB replication works.
+            </p>
+
+            <p>
+                I had to install and configure MariaDB because the
+                original server had a different database setup.
+                I also learned how to give a database user only
+                the permissions it needs.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h2>GitHub</h2>
+            <p>
+                <a href="https://github.com/nour4557/viikko4-backup">
+    My Week 4 GitHub repository
+                </a>
+            </p>
+        </div>
+
+    </div>
     </body>
     </html>
     """
-
-
-if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5001)
