@@ -93,7 +93,7 @@ def home():
             <h1>Week 4 - Server B</h1>
 
             <p style="text-align:center;">
-                My second server
+                 Week 4 Server - Replication
             </p>
 
             <h2 style="text-align:center;">Visitor Counter</h2>
@@ -108,21 +108,25 @@ def home():
 
 
         <div class="card">
-            <h2>My two servers</h2>
+            <h2>Server setup</h2>
 
             <p>
-                Server A is my first server. It runs my Week 2 page
-                and Week 3 report.
+                Server A is my first server. It runs my Week 2 application, which I made with Python and Flask, and my Week 3 report, which I made with Bash.
             </p>
 
+            <p>
+        I use Nginx to serve the pages and connect the Flask
+        application to the website.
+            </p>
             <p>
                 I made Server B from a snapshot of Server A in cPouta.
                 After creating it, I gave B its own IP address.
             </p>
 
             <p>
-                A is the main server where the visitor counter changes.
-                B gets the updates from A and shows the counter on this page.
+               Server A is the main server where the visitor counter
+        changes. Server B gets the updates through MariaDB
+        replication and shows the counter on this page.
             </p>
 
             <ul>
@@ -141,25 +145,54 @@ def home():
 
 
         <div class="card">
-            <h2>Storage and users</h2>
+    <h2>Storage and users</h2>
 
-            <p>
-                The website files on A are in /var/www/html.
-                I save the backups on B in /var/backups/website.
-            </p>
+    <h3>Server A - Primary Server</h3>
 
-            <p>
-                I use the Linux user ubuntu to run my backup script.
-                The backup folder belongs to ubuntu and other users
-                cannot access it normally.
-            </p>
+    <p>
+        Server A contains the original website files and the
+        primary MariaDB database.
+    </p>
 
-            <p>
-                I also made a database user called viikko4read for
-                my Week 4 application. It can only read the visitor
-                counter table.
-            </p>
-        </div>
+    <ul>
+        <li><code>/var/www/html/</code> - Original website files.</li>
+        <li><code>/home/ubuntu/viikko2/</code> - Week 2 Python and Flask application.</li>
+        <li><code>/home/ubuntu/viikko3/report.sh</code> - Week 3 Bash report script.</li>
+        <li><code>/var/lib/mysql/</code> - MariaDB database files.</li>
+    </ul>
+
+    <h3>Server B - Replica and Backup Server</h3>
+
+    <p>
+        Server B receives website backups from Server A and
+        has a local copy of the replicated database.
+    </p>
+
+    <ul>
+        <li><code>/var/backups/website/</code> - Website backups and backup log.</li>
+        <li><code>/home/ubuntu/viikko4/</code> - Week 4 application and backup script.</li>
+        <li><code>/var/lib/mysql/</code> - Local MariaDB database files.</li>
+        <li><code>/etc/viikko4.env</code> - Database password settings.</li>
+    </ul>
+
+    <h3>Users and permissions</h3>
+
+    <p>
+        I use the Linux user ubuntu to run the backup script.
+        The backup folder belongs to ubuntu and has restricted permissions.
+    </p>
+
+    <p>
+        I created a database user called viikko4read for the
+        Week 4 application. It only has permission to read the
+        visitor counter table.
+    </p>
+
+    <p>
+        The database on Server B is set to read-only so that
+        the application does not change the replicated data.
+    </p>
+</div>
 
 
         <div class="card">
@@ -228,24 +261,23 @@ def home():
         </div>
 
 
-        <div class="card">
+       <div class="card">
             <h2>What I learned</h2>
 
             <p>
-                I learned how to make a second server from a snapshot
-                and how to copy files between two servers.
+                I learned how to make a second server from a snapshot in CSC cPouta by launching a new instance. I also learned how to copy files between two servers.
             </p>
 
             <p>
-                I also learned how to make automatic backups with cron
-                and how MariaDB replication works.
+                One problem I had was that I didn't have enough floating IP addresses available because I still had one assigned to a test instance. I deleted the test instance and reused its floating IP addr>
             </p>
 
             <p>
-                I had to install and configure MariaDB because the
-                original server had a different database setup.
-                I also learned how to give a database user only
-                the permissions it needs.
+                I also learned how to make automatic backups with cron and how MariaDB replication works.
+            </p>
+
+            <p>
+                I had to install and configure MariaDB because the original server had a different database setup. I also learned how to give a database user only the permissions it needs.
             </p>
         </div>
 
