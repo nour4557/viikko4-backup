@@ -260,11 +260,6 @@ def home():
                 to a separate folder. I compared its SHA256 hash
                 with the original file, and they matched.
             </p>
-
-            <p>
-                I still need to check that everything works after
-                restarting Server B.
-            </p>
         </div>
 
 
