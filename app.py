@@ -45,18 +45,19 @@ def home():
 
             .container {{
                 max-width: 850px;
-                margin: auto;
+                margin: 0 auto;
             }}
 
             .card {{
-                background: #fffaf4;
+                background-color: #fffaf4;
                 padding: 25px;
                 margin-bottom: 20px;
                 border-radius: 12px;
             }}
 
-            h1, h2 {{
+            h1, h2, h3 {{
                 color: #805b43;
+                text-align: left;
             }}
 
             h1 {{
@@ -93,10 +94,10 @@ def home():
             <h1>Week 4 - Server B</h1>
 
             <p style="text-align:center;">
-                 Week 4 Server - Replication
+                Week 4 server replication
             </p>
 
-            <h2 style="text-align:center;">Visitor Counter</h2>
+            <h2>Visitor Counter</h2>
 
             <div class="counter">{visitors}</div>
 
@@ -111,22 +112,25 @@ def home():
             <h2>Server setup</h2>
 
             <p>
-                Server A is my first server. It runs my Week 2 application, which I made with Python and Flask, and my Week 3 report, which I made with Bash.
+                Server A is my first server. It runs my Week 2 application,
+                which I made with Python and Flask, and my Week 3 report,
+                which I made with Bash.
             </p>
 
             <p>
-        I use Nginx to serve the pages and connect the Flask
-        application to the website.
+                I use Nginx to serve the pages and connect the Flask
+                application to the website.
             </p>
+
             <p>
                 I made Server B from a snapshot of Server A in cPouta.
                 After creating it, I gave B its own IP address.
             </p>
 
             <p>
-               Server A is the main server where the visitor counter
-        changes. Server B gets the updates through MariaDB
-        replication and shows the counter on this page.
+                Server A is the main server where the visitor counter
+                changes. Server B gets the updates through MariaDB
+                replication and shows the counter on this page.
             </p>
 
             <ul>
@@ -145,54 +149,38 @@ def home():
 
 
         <div class="card">
-    <h2>Storage and users</h2>
+            <h2>Storage and users</h2>
 
-    <h3>Server A - Primary Server</h3>
+            <p>
+                The website files on Server A are stored in /var/www/html.
+                I save the website backups on Server B in /var/backups/website.
+            </p>
 
-    <p>
-        Server A contains the original website files and the
-        primary MariaDB database.
-    </p>
+            <p>
+                The Week 2 application is in /home/ubuntu/viikko2
+                on Server A. The Week 4 application and backup script
+                are in /home/ubuntu/viikko4 on Server B.
+            </p>
 
-    <ul>
-        <li><code>/var/www/html/</code> - Original website files.</li>
-        <li><code>/home/ubuntu/viikko2/</code> - Week 2 Python and Flask application.</li>
-        <li><code>/home/ubuntu/viikko3/report.sh</code> - Week 3 Bash report script.</li>
-        <li><code>/var/lib/mysql/</code> - MariaDB database files.</li>
-    </ul>
+            <h3>Users and permissions</h3>
 
-    <h3>Server B - Replica and Backup Server</h3>
+            <p>
+                I use the Linux user ubuntu to run the backup script.
+                The backup folder belongs to ubuntu and has restricted
+                permissions.
+            </p>
 
-    <p>
-        Server B receives website backups from Server A and
-        has a local copy of the replicated database.
-    </p>
+            <p>
+                I created a database user called viikko4read for my
+                Week 4 application. It can only read the visitor
+                counter table.
+            </p>
 
-    <ul>
-        <li><code>/var/backups/website/</code> - Website backups and backup log.</li>
-        <li><code>/home/ubuntu/viikko4/</code> - Week 4 application and backup script.</li>
-        <li><code>/var/lib/mysql/</code> - Local MariaDB database files.</li>
-        <li><code>/etc/viikko4.env</code> - Database password settings.</li>
-    </ul>
-
-    <h3>Users and permissions</h3>
-
-    <p>
-        I use the Linux user ubuntu to run the backup script.
-        The backup folder belongs to ubuntu and has restricted permissions.
-    </p>
-
-    <p>
-        I created a database user called viikko4read for the
-        Week 4 application. It only has permission to read the
-        visitor counter table.
-    </p>
-
-    <p>
-        The database on Server B is set to read-only so that
-        the application does not change the replicated data.
-    </p>
-</div>
+            <p>
+                The database on Server B is set to read-only so the
+                application does not change the replicated data.
+            </p>
+        </div>
 
 
         <div class="card">
@@ -200,7 +188,8 @@ def home():
 
             <p>
                 I made a script called backup.sh to copy the website
-                files from A to B. I used rsync and SSH for this.
+                files from Server A to Server B. I used rsync and SSH
+                for this.
             </p>
 
             <p>
@@ -219,13 +208,14 @@ def home():
             <h2>Database replication</h2>
 
             <p>
-                I set up MariaDB replication between A and B.
-                A is the main database and B gets the changes from it.
+                I set up MariaDB replication between Server A and
+                Server B. Server A is the main database and Server B
+                receives the changes from it.
             </p>
 
             <p>
-                I opened the Week 2 page on A a few times and saw
-                that the counter updated on B too.
+                I opened the Week 2 page on Server A a few times and
+                saw that the counter updated on Server B too.
             </p>
 
             <p>
@@ -235,9 +225,9 @@ def home():
 
             <p>
                 Replication is not the same as a backup. If I delete
-                something by mistake on A, that change can also appear
-                on B. Backups are useful because I can go back to an
-                older copy of the files.
+                something by mistake on Server A, that change can also
+                appear on Server B. Backups are useful because I can
+                go back to an older copy of the files.
             </p>
         </div>
 
@@ -245,39 +235,66 @@ def home():
         <div class="card">
             <h2>Testing</h2>
 
-            <ul>
-                <li>I checked that both Week 2 and Week 4 pages open.</li>
-                <li>I opened the Week 2 page on A a few times and saw that the counter updated on B too.</li>
-                <li>I opened the Week 4 page on B and checked that it did not increase the counter.</li>
-                <li>I checked MariaDB and saw that both replication threads were running.</li>
-                <li>I made timestamped backups of the website files.</li>
-                <li>I restored a test file to another folder and checked its SHA256 hash against the original file. They matched.</li>
-            </ul>
+            <p>
+                I checked that both the Week 2 and Week 4 pages open
+                correctly.
+            </p>
 
             <p>
-                I still need to test that everything works after
+                I opened the Week 2 page on Server A a few times and
+                checked that the visitor counter also updated on Server B.
+            </p>
+
+            <p>
+                I also checked that the Week 4 page only shows the
+                counter and does not increase it.
+            </p>
+
+            <p>
+                I checked MariaDB replication and saw that both
+                replication threads were running.
+            </p>
+
+            <p>
+                I tested the website backups and restored one file
+                to a separate folder. I compared its SHA256 hash
+                with the original file, and they matched.
+            </p>
+
+            <p>
+                I still need to check that everything works after
                 restarting Server B.
             </p>
         </div>
 
 
-       <div class="card">
+        <div class="card">
             <h2>What I learned</h2>
 
             <p>
-                I learned how to make a second server from a snapshot in CSC cPouta by launching a new instance. I also learned how to copy files between two servers.
+                I learned how to make a second server from a snapshot
+                in CSC cPouta by launching a new instance. I also
+                learned how to copy files between two servers.
             </p>
 
             <p>
-                One problem I had was that I didn't have enough floating IP addresses available because I still had one assigned to a test instance. I deleted the test instance and reused its floating IP addr>
+                One problem I had was that I didn't have enough
+                floating IP addresses available because I still
+                had one assigned to a test instance. I deleted
+                the test instance and reused its floating IP
+                address for my new server.
             </p>
 
             <p>
-                I also learned how to make automatic backups with cron and how MariaDB replication works.
+                I also learned how to make automatic backups with
+                cron and how MariaDB replication works.
             </p>
 
             <p>
-                I had to install and configure MariaDB because the original server had a different database setup. I also learned how to give a database user only the permissions it needs.
+                I had to install and configure MariaDB because
+                the original server had a different database setup.
+                I also learned how to give a database user only
+                the permissions it needs.
             </p>
         </div>
 
@@ -286,7 +303,7 @@ def home():
             <h2>GitHub</h2>
             <p>
                 <a href="https://github.com/nour4557/viikko4-backup">
-    My Week 4 GitHub repository
+                    My Week 4 GitHub repository
                 </a>
             </p>
         </div>
